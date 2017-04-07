@@ -255,7 +255,11 @@ defmodule Elixometer do
   """
   defmacro timed(name, units \\ :microsecond, do: block) do
     quote do
-      {elapsed_us, rv} = :timer.tc(fn -> unquote(block) end)
+      start_t = :os.timestamp()
+
+      rv = unquote(block)
+
+      elapsed_us = :timer.now_diff(:os.timestamp(), start_t)
       Updater.timer(unquote(name), unquote(units), elapsed_us)
       rv
     end
